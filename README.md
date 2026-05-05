@@ -14,6 +14,9 @@ Built with:
   Local URL: http://localhost:8502
   Network URL: http://192.168.1.184:8502
   
+## streamlit cloud
+https://sentiment-analysisapp-qqzxw6exrhfvsby5ygndf2.streamlit.app/
+  
 ## 📌 Problem Statement
 
 Customer reviews contain valuable signals about product satisfaction, but manually analyzing them at scale is impossible.
