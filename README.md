@@ -147,4 +147,4 @@ However, it also highlights the limitations of traditional NLP approaches and mo
 ## 🧑‍💻 Author
 
 Built by Naomi Kerubo  
-Actuarial Science | Data Science | ML Enthusiast
+Actuarial Science | Data Science | Machine Learning
