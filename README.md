@@ -1,150 +1,253 @@
-# 💬 Sentiment Analysis of Amazon Product Reviews
+# 🧠 NLP-Powered Amazon Review Sentiment Classifier
 
-A machine learning-powered web application that classifies Amazon product reviews as **positive or negative sentiment** 
-using Natural Language Processing (NLP) techniques and traditional machine learning models.
+A machine learning-powered web application that classifies Amazon product reviews as **positive** or **negative** sentiment using Natural Language Processing (NLP) techniques and traditional machine learning models.
 
-Built with:
-- Python
-- Scikit-learn
-- TF-IDF Vectorization
-- Logistic Regression / SVM / Naive Bayes
-- Streamlit (for deployment)
+This project demonstrates how effective preprocessing, feature engineering, and model selection can build reliable NLP systems without requiring computationally expensive deep learning architectures.
 
 ## 🚀 Live Demo
-  Local URL: http://localhost:8502
-  Network URL: http://192.168.1.184:8502
-  
-## streamlit cloud
+
+🌐 Streamlit Cloud Deployment:  
 https://sentiment-analysisapp-qqzxw6exrhfvsby5ygndf2.streamlit.app/
-  
+
 ## 📌 Problem Statement
 
-Customer reviews contain valuable signals about product satisfaction, but manually analyzing them at scale is impossible.
+E-commerce platforms receive thousands of customer reviews daily, making it difficult for businesses to manually monitor customer satisfaction and identify negative product experiences in real time.
 
-This project builds a classifier that:
-- Takes raw product reviews
-- Cleans and processes text
-- Predicts sentiment (positive / negative)
-- Outputs confidence scores for interpretability
+Without automated sentiment analysis:
+- Poor customer experiences may go unnoticed
+- Product quality issues become harder to detect
+- Businesses struggle to analyze customer feedback at scale
+
+This project uses Natural Language Processing (NLP) and machine learning to automatically classify Amazon product reviews as positive or negative sentiment, enabling faster and more scalable customer feedback analysis.
+
+## ✅ Solution Overview
+
+The application allows users to input Amazon-style product reviews and instantly receive:
+
+- Sentiment prediction (Positive or Negative)
+- Confidence score
+- Real-time text classification through a deployed web interface
+
+The system processes raw text using NLP preprocessing techniques and transforms text into numerical representations using TF-IDF vectorization before passing it into trained machine learning models for prediction.
+
+## 🏗️ System Architecture
+
+```text
+User Review
+    ↓
+Text Preprocessing
+    ↓
+TF-IDF Vectorization
+    ↓
+Trained ML Model
+    ↓
+Sentiment Prediction
+```
 
 ## 🧠 Approach
 
-This project follows a classic NLP pipeline:
+This project follows a classic NLP machine learning pipeline:
 
 ### 1. Data Understanding
-- Dataset: Amazon product reviews
-- Target: Sentiment label (binary classification)
-- Features: Review headline + review body
+
+- Dataset: Amazon Product Reviews
+- Target Variable: Sentiment Label (Binary Classification)
+- Features Used:
+  - Review Headline
+  - Review Body
+
+The headline and body were merged to create richer textual context for prediction.
 
 ### 2. Data Cleaning
-Text preprocessing includes:
-- Lowercasing
+
+Text preprocessing included:
+
+- Lowercasing text
 - Removing HTML tags
 - Removing special characters and numbers
-- Merging headline + body for richer context
+- Removing unnecessary whitespace
+- Combining review headline and body
+
+These steps help reduce noise and improve model consistency.
 
 ### 3. Feature Engineering
-- TF-IDF Vectorization
-- Uni-grams and bi-grams used
-- Stopwords removed
-- Feature cap set to reduce sparsity (max_features=1000)
 
+TF-IDF (Term Frequency–Inverse Document Frequency) Vectorization was used to convert text into numerical features.
+
+Techniques applied:
+
+- Uni-grams and bi-grams
+- Stopword removal
+- Maximum feature cap (`max_features=1000`) to reduce sparsity
+
+TF-IDF was chosen because it performs exceptionally well on sparse textual classification tasks.
 
 ### 4. Handling Class Imbalance
-The dataset was imbalanced, so I applied:
-- Random oversampling of minority class
 
-This improves recall on underrepresented sentiment classes but introduces slight overfitting risk.
+The dataset contained imbalanced sentiment classes.
 
+To improve minority class prediction:
+- Random oversampling was applied
+
+This improved recall performance, although it introduced a slight risk of overfitting.
 
 ### 5. Model Selection
 
-I compared three models:
+Three machine learning models were compared:
 
-- Naive Bayes (baseline, fast, interpretable)
-- Logistic Regression (best balance of performance + stability)
-- Linear SVM (strong margin-based classifier)
+- Naive Bayes
+- Logistic Regression
+- Linear Support Vector Machine (SVM)
 
-Hyperparameter tuning was done using GridSearchCV with 5-fold cross-validation using F1-score as the evaluation metric.
+Hyperparameter tuning was performed using:
+
+- GridSearchCV
+- 5-fold Cross Validation
+- F1-score optimization
 
 ## 🏆 Key Insight
 
-Logistic Regression consistently performed best due to:
-- High-dimensional TF-IDF compatibility
-- Good generalization on sparse text data
-- Stable performance across folds
+Logistic Regression consistently delivered the best balance between:
 
+- Accuracy
+- Stability
+- Generalization
+- Interpretability
 
-## ⚠️ Where the Model Fails
+This is largely because Logistic Regression performs extremely well on high-dimensional sparse TF-IDF features.
 
-No model is perfect. This one struggles with:
+## 🤔 Why Traditional Machine Learning Instead of Deep Learning?
 
-### 1. Sarcasm & irony
+Although transformer-based architectures like BERT achieve state-of-the-art NLP performance, this project intentionally focuses on traditional machine learning models because they offer:
+
+- Faster training times
+- Lower computational cost
+- Easier interpretability
+- Simpler deployment
+- Strong performance on structured sentiment classification tasks
+
+This project demonstrates that strong preprocessing and feature engineering can still produce highly effective NLP systems without requiring heavy deep learning infrastructure.
+
+## ⚠️ Model Limitations
+
+No model is perfect. This classifier still struggles with:
+
+### 1. Sarcasm & Irony
+
 Example:
+
 > “Oh great, another product that stopped working in 2 days.”
 
-Model often misclassifies due to literal keyword reliance.
+The model may misclassify sarcastic reviews because traditional models rely heavily on keyword patterns rather than contextual understanding.
 
-### 2. Context-heavy reviews
-Long reviews with mixed sentiment confuse the classifier (positive + negative clauses).
+### 2. Mixed Sentiment Reviews
 
-### 3. Domain shift
-Trained on Amazon data → may not generalize well to:
+Long reviews containing both positive and negative clauses can confuse the classifier.
+
+Example:
+- “The product quality is excellent, but delivery was terrible.”
+
+### 3. Domain Shift
+
+The model was trained on Amazon product reviews and may not generalize effectively to:
+
 - Twitter sentiment
+- Informal slang-heavy text
 - App reviews
-- informal slang-heavy text
+- Customer support conversations
 
-## 🔧 How It Can Be Improved
+## 🔧 Future Improvements
 
-If this were production-grade, I would upgrade it using:
+If this project were extended to production-level deployment, improvements would include:
 
-### 1. Transformer-based models
-Replace TF-IDF + ML with:
-- BERT / DistilBERT
-This would significantly improve contextual understanding.
+### 1. Transformer-Based Models
 
-### 2. Better imbalance handling
+Replacing TF-IDF + traditional ML with:
+- BERT
+- DistilBERT
+
+This would significantly improve contextual understanding and sarcasm detection.
+
+### 2. Improved Imbalance Handling
+
 Instead of oversampling:
-- Use class weights (more stable)
-- Or focal loss in deep learning models
+- Class weighting
+- Focal loss techniques
 
+could improve robustness.
 
-### 3. Advanced text preprocessing
+### 3. Advanced NLP Preprocessing
+
+Additional improvements:
 - Lemmatization
-- Negation handling (“not good” → important reversal signal)
+- Negation handling
+- Context-aware tokenization
 
-### 4. Threshold tuning
-Adjust decision thresholds instead of default 0.5 for better recall/precision balance.
+Example:
+- “not good” should carry stronger negative meaning.
+
+### 4. Threshold Optimization
+
+Instead of using the default prediction threshold of 0.5, threshold tuning could improve:
+- Precision
+- Recall
+- Business-specific performance objectives
 
 ## 📊 Evaluation Metrics
 
 Model performance was evaluated using:
+
 - Accuracy
 - Precision
 - Recall
 - F1-score
 - Confusion Matrix
 
-F1-score was prioritized due to class imbalance.
-
+F1-score was prioritized because the dataset contained class imbalance.
 
 ## 🌐 Deployment
 
-The model is deployed using Streamlit:
+The application was deployed using Streamlit.
 
-- User inputs a review
-- Text is cleaned and vectorized
-- Model predicts sentiment
-- Confidence score is displayed
+Workflow:
+1. User inputs a review
+2. Text is cleaned and vectorized
+3. The trained model predicts sentiment
+4. Confidence probability is displayed
+
+## 🏢 Real-World Applications
+
+This type of sentiment analysis system can be applied in:
+
+- E-commerce review monitoring
+- Customer feedback analysis
+- Brand reputation tracking
+- Social media sentiment monitoring
+- Product quality monitoring
+- Customer support prioritization
 
 ## 💡 Key Takeaway
 
-This project is a classic example of:
-> “Simple models + good preprocessing can outperform complex models if done correctly.”
+This project highlights an important machine learning principle:
 
-However, it also highlights the limitations of traditional NLP approaches and motivates a transition toward transformer-based architectures for production-level sentiment analysis.
+> “Simple models combined with strong preprocessing and feature engineering can outperform unnecessarily complex solutions.”
 
-## 🧑‍💻 Author
+At the same time, it demonstrates the limitations of traditional NLP systems and the growing importance of transformer-based architectures for production-grade language understanding.
 
-Built by Naomi Kerubo  
-Actuarial Science | Data Science | Machine Learning
+## 🛠️ Tech Stack
+
+- Python
+- Scikit-learn
+- Pandas
+- NumPy
+- TF-IDF Vectorization
+- Logistic Regression
+- Linear SVM
+- Naive Bayes
+- Streamlit
+
+## 👩‍💻 Author
+
+Built by Kerubo Bosire
+
+Actuarial Science | Data Science | Machine Learning | NLP
