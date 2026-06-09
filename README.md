@@ -4,6 +4,11 @@ A machine learning-powered web application that classifies Amazon product review
 
 🌐 **Live Demo:** https://sentiment-analysisapp-qqzxw6exrhfvsby5ygndf2.streamlit.app/
 
+### Snippet of the app
+
+<img width="1350" height="563" alt="image" src="https://github.com/user-attachments/assets/1436ead3-e949-49f1-a736-0249c94ed81c" />
+
+
 ## 📌 Problem Statement
 
 E-commerce platforms receive thousands of customer reviews daily, making it difficult for businesses to manually monitor customer satisfaction and identify negative product experiences in real time.
