@@ -64,35 +64,21 @@ A model is only as trustworthy as your honesty about its limits. Three failure m
 
 **Domain shift.** The model was trained on Amazon product reviews specifically. Vocabulary, review length, and tone on Amazon don't transfer cleanly to Twitter sentiment, app store reviews, or live customer support chat — all of which have different baseline sentiment vocabularies and informal slang the model has never seen.
 
-The keyword highlighting feature doesn't fix any of these three problems, but it does something almost as useful: it makes them visible. When the model gets a sarcastic or mixed review wrong, the keyword breakdown usually shows you exactly why — you can see it latched onto "excellent" and missed the sarcasm, or weighted the positive clause more heavily than the negative one. That transparency turns a silent failure into a legible one, which is most of what you actually want from an interpretable model.
+None of that gets fixed by a nicer interface. But it does become visible — when the model gets a sarcastic or mixed review wrong, you can usually watch it happen in the keyword highlighting: see it latch onto "excellent" and miss the sarcasm entirely, or weigh one clause more heavily than the other. A wrong answer you can see the reasoning behind is a fundamentally different thing than a wrong answer you just have to take on faith.
 
 ---
 
-## Making the Model Legible
+## What Using It Actually Looks Like
 
-A classifier that just prints `"Positive (87.23% confidence)"` asks you to trust it blindly. That's a bad place to leave a model that — as the next section explains — has real, predictable failure modes. So the interface was built to expose its reasoning, not just its output:
+Paste in a review — or click one of the three pre-filled examples (clearly positive, clearly negative, and a deliberately mixed one) — and the model returns a label almost instantly. But the label was never the interesting part of this update. What changed is everything around it.
 
-**Confidence bar.** The raw probability score is rendered as an animated bar that fills green or red depending on the call — faster to read at a glance than a percentage, especially when you're scanning many reviews back to back.
+Instead of a flat confidence percentage, you get an animated bar that fills green or red as it loads — something you read in half a second rather than parsing a number. Underneath it, the review text itself lights up: words like `excellent` or `terrible` get highlighted right where they appear, so you're not just told the verdict, you can see the exact evidence the model used to reach it. That single change is what turns this from a black box into something you can actually audit — if the model gets a review wrong, you can usually tell *why* just by looking at what it latched onto.
 
-**Keyword signal analysis.** The app highlights the specific words it picked up on — `excellent`, `terrible`, and so on — directly in the review text. This is the single most important interface decision in the app: it turns "the model says positive" into "the model says positive *because of these words*," which is the difference between a black box and a tool you can actually audit and trust.
+Below that sits a quieter layer of detail: a word count, sentence count, and a chip-style list of the most prominent non-stopword terms in the review, useful for skimming something long without reading every line. None of this changes the prediction. It changes whether you trust it.
 
-**Top keyword chips.** A cleaned, stopword-filtered list of the most prominent words in the review, displayed as chips. Useful for skimming a long review without reading the whole thing.
+The real shift, though, is what happens once you stop testing one review at a time. Upload a CSV with a `review` column and the app classifies every row in one pass — positive count, negative count, overall positive rate, and a results file you can download and hand to someone else. That's the difference between a demo and a tool: a single-review classifier proves the model works, but a batch processor that takes a day's worth of customer feedback and returns a triaged spreadsheet is something a small team could actually plug into how they already work, without writing a line of code.
 
-**Text statistics panel.** Word count, sentence count, unique word count, average word length. Small, but it signals the tool is actually parsing the text rather than just running it through a black box and printing a label.
-
-**Example buttons.** Three pre-filled examples — clearly positive, mixed, and clearly negative — so a new visitor can see the model in action immediately, including on the mixed case where it's expected to be less confident. That last part matters: showing the model struggle a little on a genuinely ambiguous review is more honest than only ever demoing the easy cases.
-
-**Sidebar settings.** Toggles to show or hide each analysis section (confidence bar, keywords, stats), so the default view stays clean but power users can expand everything.
-
----
-
-## Batch Analysis
-
-The biggest functional upgrade: you can now upload a CSV with a `review` column and get every row classified in one pass, with summary metrics — total reviews, positive count, negative count, positive rate — and a downloadable results CSV.
-
-This is what moves the project from "demo of a model" to "tool someone could actually use." A single-review classifier is a nice proof of concept; a batch processor that takes a day's worth of reviews and returns a triaged CSV is something a small team could genuinely plug into a feedback workflow without writing a line of code.
-
-**Analysis history.** Every review run through the single-review mode gets logged in session state and shown in a scrollable sidebar history with colour-coded sentiment badges — useful for comparing how the model handled a series of reviews in the same session, and it makes the app feel persistent rather than stateless.
+Everything you run in single-review mode also gets logged to a sidebar history with colour-coded badges, so a session builds up a visible trail rather than each review disappearing the moment you move to the next one. And a settings panel lets you collapse any of this away — the confidence bar, the keywords, the stats — so the interface stays clean by default but opens up for anyone who wants more.
 
 ---
 
