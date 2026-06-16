@@ -7,7 +7,8 @@
 ### Snippet of the app
 
 <img width="1350" height="563" alt="image" src="https://github.com/user-attachments/assets/1436ead3-e949-49f1-a736-0249c94ed81c" />
-## The Problem
+
+### The Problem
 
 E-commerce platforms collect thousands of reviews a day. Somewhere in that pile is the early signal of a defective product batch, a shipping problem, or a feature customers hate — but nobody can read 4,000 reviews a day to find it.
 
