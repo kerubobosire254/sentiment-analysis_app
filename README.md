@@ -70,15 +70,11 @@ None of that gets fixed by a nicer interface. But it does become visible — whe
 
 ## What Using It Actually Looks Like
 
-Paste in a review — or click one of the three pre-filled examples (clearly positive, clearly negative, and a deliberately mixed one) — and the model returns a label almost instantly. But the label was never the interesting part of this update. What changed is everything around it.
+Paste in a review, or click one of three examples — clearly positive, clearly negative, and a deliberately mixed one. The label comes back almost instantly.
 
-Instead of a flat confidence percentage, you get an animated bar that fills green or red as it loads — something you read in half a second rather than parsing a number. Underneath it, the review text itself lights up: words like `excellent` or `terrible` get highlighted right where they appear, so you're not just told the verdict, you can see the exact evidence the model used to reach it. That single change is what turns this from a black box into something you can actually audit — if the model gets a review wrong, you can usually tell *why* just by looking at what it latched onto.
+But the label was never the point. Watch the confidence bar fill green or red as it loads. Look at the review text itself — words like excellent or terrible light up right where they appear, so you can see exactly what the model used to make its call. That's the difference between trusting a black box and actually checking its work.
 
-Below that sits a quieter layer of detail: a word count, sentence count, and a chip-style list of the most prominent non-stopword terms in the review, useful for skimming something long without reading every line. None of this changes the prediction. It changes whether you trust it.
-
-The real shift, though, is what happens once you stop testing one review at a time. Upload a CSV with a `review` column and the app classifies every row in one pass — positive count, negative count, overall positive rate, and a results file you can download and hand to someone else. That's the difference between a demo and a tool: a single-review classifier proves the model works, but a batch processor that takes a day's worth of customer feedback and returns a triaged spreadsheet is something a small team could actually plug into how they already work, without writing a line of code.
-
-Everything you run in single-review mode also gets logged to a sidebar history with colour-coded badges, so a session builds up a visible trail rather than each review disappearing the moment you move to the next one. And a settings panel lets you collapse any of this away — the confidence bar, the keywords, the stats — so the interface stays clean by default but opens up for anyone who wants more.
+Got a CSV full of reviews instead of one? Upload it. Every row gets classified, with a summary — total reviews, positive rate, the works — and a results file you can download and hand to someone else. That's what turns this from a demo into a tool a small team could use on a real Monday morning.
 
 ---
 
