@@ -1,175 +1,111 @@
 # 🧠 SentimentIQ — Amazon Review Intelligence Platform
 
-A machine learning-powered web application that classifies Amazon product reviews as **Positive** or **Negative** sentiment using Natural Language Processing — built to demonstrate that strong preprocessing and feature engineering can produce highly effective NLP systems without expensive deep learning infrastructure.
+[![Python](https://img.shields.io/badge/Python-3.8+-blue?style=flat-square&logo=python)](https://python.org) [![Streamlit](https://img.shields.io/badge/Built%20with-Streamlit-ff4b4b?style=flat-square&logo=streamlit)](https://streamlit.io) [![Scikit-learn](https://img.shields.io/badge/Model-Scikit--learn-f7931e?style=flat-square&logo=scikitlearn)](https://scikit-learn.org) [![Live Demo](https://img.shields.io/badge/Live-Demo-2ea44f?style=flat-square)](https://sentiment-analysisapp-qqzxw6exrhfvsby5ygndf2.streamlit.app/)
 
 🌐 **Live Demo:** https://sentiment-analysisapp-qqzxw6exrhfvsby5ygndf2.streamlit.app/
 
 ### Snippet of the app
 
 <img width="1350" height="563" alt="image" src="https://github.com/user-attachments/assets/1436ead3-e949-49f1-a736-0249c94ed81c" />
+## The Problem
 
+E-commerce platforms collect thousands of reviews a day. Somewhere in that pile is the early signal of a defective product batch, a shipping problem, or a feature customers hate — but nobody can read 4,000 reviews a day to find it.
 
-## 📌 Problem Statement
+The usual fix people reach for is "just throw a transformer at it." BERT, fine-tune it, deploy it, done. That works, but it's also slower to train, harder to deploy cheaply, and overkill for a binary positive/negative classification task that doesn't actually need deep contextual language understanding to solve well.
 
-E-commerce platforms receive thousands of customer reviews daily, making it difficult for businesses to manually monitor customer satisfaction and identify negative product experiences in real time.
+This project asks a more useful question: **how far can disciplined preprocessing and a classical ML model get you, and where exactly does it break?**
 
-Without automated sentiment analysis:
-- Poor customer experiences may go unnoticed
-- Product quality issues become harder to detect
-- Businesses struggle to analyze customer feedback at scale
+---
 
-This project uses NLP and machine learning to automatically classify Amazon product reviews as positive or negative, enabling faster and more scalable customer feedback analysis.
+## What It Does
 
-
-## ✅ What the App Does
-
-Paste any product review and SentimentIQ instantly returns:
-
-- **Sentiment prediction** (Positive or Negative) with a visual confidence bar
-- **Keyword signal detection** — which specific words drove the prediction
-- **Text statistics** — word count, sentence count, unique vocabulary, average word length
-- **Top keywords** extracted from the review (stopwords removed)
-- **Batch CSV analysis** — upload hundreds of reviews, get results with a summary dashboard, download as CSV
-- **Session history** — every analysis logged in the sidebar for easy reference
-
-| Feature | Description |
-|---|---|
-| Single review analysis | Real-time prediction with animated confidence bar |
-| Keyword signal detection | Highlights positive and negative trigger words |
-| Text statistics panel | Word count, sentences, unique words, avg length |
-| Batch CSV analysis | Upload → classify → download results |
-| Analysis history | Session history in the sidebar |
-| Pre-filled examples | One-click positive, mixed, and negative samples |
-| Toggleable panels | Show/hide each section via sidebar settings |
-
-
-## 🏗️ System Architecture
+The app takes an Amazon-style product review as text input and returns a sentiment prediction (Positive / Negative) with a confidence score, in real time, through a deployed web interface. No GPU required, no API call to an LLM, sub-second inference.
 
 ```
-User Review Input
-       ↓
-Text Preprocessing
-(lowercase · strip HTML · remove special chars)
-       ↓
-TF-IDF Vectorization
-(unigrams + bigrams · max 1000 features · stopword removal)
-       ↓
-Logistic Regression Model
-       ↓
+User Review
+    ↓
+Text Preprocessing (lowercase, strip HTML, remove noise)
+    ↓
+TF-IDF Vectorization (uni-grams + bi-grams, max 1000 features)
+    ↓
+Logistic Regression
+    ↓
 Sentiment + Confidence Score
-```
-
-## 🧠 Approach
-
-### 1. Data Understanding
-- **Dataset:** Amazon Product Reviews
-- **Target:** Sentiment label (binary classification)
-- **Features:** Review headline + body merged to create richer textual context
-
-### 2. Data Cleaning
-- Lowercasing, HTML tag removal, special character stripping, whitespace normalisation
-- Combining headline and review body for maximum signal
-
-### 3. Feature Engineering
-TF-IDF Vectorization was used to convert text into numerical features:
-- Unigrams and bigrams
-- Stopword removal
-- `max_features=1000` to reduce sparsity
-
-TF-IDF was chosen because it performs exceptionally well on sparse textual classification tasks.
-
-### 4. Handling Class Imbalance
-The dataset contained imbalanced sentiment classes. Random oversampling was applied to improve minority class recall — though this introduces a slight overfitting risk.
-
-### 5. Model Selection
-Three models were benchmarked:
-
-| Model | Notes |
-|---|---|
-| Naive Bayes | Fast baseline |
-| **Logistic Regression** ✅ | **Best overall — selected** |
-| Linear SVM | Competitive but less interpretable |
-
-Hyperparameter tuning via **GridSearchCV** with 5-fold cross-validation, optimising for **F1-score**.
-
-## 🏆 Key Insight
-
-Logistic Regression consistently delivered the best balance of accuracy, stability, generalisation, and interpretability. This is largely because it performs exceptionally well on high-dimensional sparse TF-IDF feature spaces.
-
-## 🤔 Why Traditional ML Instead of Deep Learning?
-
-Although transformer architectures like BERT achieve state-of-the-art NLP performance, this project intentionally uses traditional ML because it offers:
-
-- Faster training times
-- Lower computational cost
-- Easier interpretability
-- Simpler deployment
-- Strong performance on structured sentiment classification tasks
-
-> *"Simple models combined with strong preprocessing and feature engineering can outperform unnecessarily complex solutions."*
-
-## ⚠️ Model Limitations
-
-**Sarcasm & irony** — the model reads keyword patterns, not intent.
-> *"Oh great, another product that stopped working in 2 days."* → may be misclassified as positive.
-
-**Mixed sentiment** — long reviews with both positive and negative clauses can confuse the classifier.
-> *"The product quality is excellent, but delivery was terrible."*
-
-**Domain shift** — trained on Amazon product reviews; performance may drop on tweets, app reviews, or informal slang-heavy text.
-
-## 🔧 Future Improvements
-
-1. **Transformer-based models** — replace TF-IDF + LR with fine-tuned DistilBERT for contextual understanding and sarcasm detection
-2. **Improved imbalance handling** — class weighting or focal loss instead of oversampling
-3. **Advanced preprocessing** — lemmatisation, negation handling (`"not good"` → strong negative), context-aware tokenisation
-4. **Threshold optimisation** — tune the 0.5 decision boundary for precision/recall trade-offs specific to business objectives
-5. **Aspect-based sentiment** — separate scores for product quality, delivery, value, etc.
-
-## 📊 Evaluation Metrics
-
-F1-score was prioritised due to class imbalance. Full evaluation used: Accuracy · Precision · Recall · F1-score · Confusion Matrix.
-
-## 🏢 Real-World Applications
-
-- E-commerce review monitoring
-- Customer feedback analysis at scale
-- Brand reputation tracking
-- Social media sentiment monitoring
-- Product quality issue detection
-- Customer support ticket prioritisation
-
-## 🛠️ Tech Stack
-
-Python · Scikit-learn · Pandas · NumPy · TF-IDF Vectorisation · Logistic Regression · Linear SVM · Naive Bayes · Streamlit
-
-
-## 🚀 Run Locally
-
-```bash
-git clone https://github.com/kerubobosire254/sentiment-analysis_app.git
-cd sentiment-analysis_app
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-`model.pkl` must be present in the root directory before running.
-
-## 📁 Project Structure
-
-```
-sentiment-analysis_app/
-├── app.py                        # Streamlit application
-├── model.pkl                     # Trained Logistic Regression pipeline
-├── requirements.txt              # Python dependencies
-├── sentiment analysis.ipynb      # Training & evaluation notebook
-└── Amazon-Product-Reviews.csv    # Training dataset
 ```
 
 ---
 
-## 👩‍💻 Author
+## The Approach
 
-**Kerubo Bosire** — Actuarial Science · Data Science · Machine Learning · NLP
+**Data.** Amazon Product Reviews dataset, binary sentiment labels. Review headline and body were merged into a single text field — headlines alone are often too short to carry sentiment signal reliably, and combining them gave the model more context per example.
 
-[![GitHub](https://img.shields.io/badge/GitHub-kerubobosire254-181717?style=flat&logo=github)](https://github.com/kerubobosire254)
+**Cleaning.** Lowercasing, HTML tag removal, special character and number stripping, whitespace normalization. Standard, but skipping any one of these steps measurably hurt model performance during testing — TF-IDF is sensitive to vocabulary noise in a way deep models are more robust to.
+
+**Feature engineering.** TF-IDF with uni-grams and bi-grams, capped at 1000 features. The bi-grams matter more than they sound — "not good" and "very good" need to be distinguishable, and a unigram-only model conflates them since both contain "good."
+
+**Class imbalance.** The dataset skewed positive, as most review datasets do. Random oversampling brought the minority class up, which improved recall on negative reviews — the ones that actually matter for catching problems early — at a modest cost of slight overfitting risk, which was monitored via cross-validation.
+
+**Model selection.** Three models were compared head-to-head: Naive Bayes, Logistic Regression, and Linear SVM, tuned via GridSearchCV with 5-fold cross-validation, optimizing for F1-score (chosen over accuracy because of the class imbalance).
+
+**Winner: Logistic Regression.** Not because it's the most powerful model in the comparison — Linear SVM was close — but because it gave the best balance of accuracy, stability across folds, and interpretability. On high-dimensional sparse TF-IDF features, logistic regression's linear decision boundary is enough; the extra complexity of more powerful models bought essentially nothing here.
+
+---
+
+## Where It Breaks
+
+A model is only as trustworthy as your honesty about its limits. Three failure modes showed up clearly in testing:
+
+**Sarcasm and irony.** *"Oh great, another product that stopped working in 2 days."* Every keyword in that sentence reads positive. The model has no mechanism to detect tonal inversion — it's pattern-matching on words, not reasoning about meaning. This is the single biggest gap between this approach and a transformer model.
+
+**Mixed sentiment.** *"The product quality is excellent, but delivery was terrible."* Real reviews are rarely purely one sentiment. A binary classifier forces a single label onto a review that genuinely contains both, and which way it falls often comes down to which clause has more TF-IDF weight rather than which sentiment the reviewer meant to emphasize.
+
+**Domain shift.** The model was trained on Amazon product reviews specifically. Vocabulary, review length, and tone on Amazon don't transfer cleanly to Twitter sentiment, app store reviews, or live customer support chat — all of which have different baseline sentiment vocabularies and informal slang the model has never seen.
+
+---
+
+## Why This Tradeoff Was Worth Making
+
+Transformer models would likely close all three gaps above to some degree. But they come with real costs: heavier infrastructure, slower inference, harder interpretability, and meaningfully more expensive to train and serve at scale.
+
+For a use case like "flag negative reviews for a human to review," the classical pipeline here gets you to a genuinely useful tool — fast, cheap, explainable, and good enough — and the honest documentation of where it fails is itself valuable: it tells you exactly when you'd need to upgrade to something heavier, instead of pretending the simple model handles everything.
+
+---
+
+## Evaluation
+
+Performance was assessed on Accuracy, Precision, Recall, F1-score, and Confusion Matrix, with F1 prioritized given the class imbalance in the underlying dataset.
+
+---
+
+## What's Next
+
+If this moved toward production deployment, in priority order:
+
+- **Negation-aware preprocessing** — explicitly tagging negation scope so "not good" carries distinguishable signal from "good," rather than relying on bi-grams to catch it implicitly
+- **Threshold tuning** — moving off the default 0.5 cutoff to a threshold calibrated for the actual business cost of false negatives vs. false positives (missing a real complaint is usually worse than a false alarm)
+- **Transformer upgrade path** — DistilBERT as a drop-in replacement for the cases that matter most: sarcasm and mixed-sentiment reviews specifically, potentially as a second-stage model that only runs on reviews the classical model flags as low-confidence
+- **Class weighting over oversampling** — testing whether class-weighted loss reduces the overfitting risk that oversampling introduced, without sacrificing the recall gains
+
+---
+
+## Real-World Applications
+
+E-commerce review monitoring, customer feedback triage, brand reputation tracking, social media sentiment monitoring, product quality early-warning systems, and support ticket prioritization.
+
+---
+
+## Tech Stack
+
+| Component | Technology |
+|-----------|-----------|
+| Language | Python |
+| ML | Scikit-learn (Logistic Regression, Linear SVM, Naive Bayes) |
+| Feature Engineering | TF-IDF Vectorization |
+| Data Handling | Pandas, NumPy |
+| Frontend | Streamlit |
+
+---
+
+## Built By
+
+**Kerubo Bosire** — Actuarial Science | Data Science | Machine Learning | NLP
