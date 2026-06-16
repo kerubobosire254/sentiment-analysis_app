@@ -8,7 +8,7 @@
 
 <img width="1350" height="563" alt="image" src="https://github.com/user-attachments/assets/1436ead3-e949-49f1-a736-0249c94ed81c" />
 
-### The Problem
+## The Problem
 
 E-commerce platforms collect thousands of reviews a day. Somewhere in that pile is the early signal of a defective product batch, a shipping problem, or a feature customers hate — but nobody can read 4,000 reviews a day to find it.
 
@@ -20,10 +20,10 @@ This project asks a more useful question: **how far can disciplined preprocessin
 
 ## What It Does
 
-The app takes an Amazon-style product review as text input and returns a sentiment prediction (Positive / Negative) with a confidence score, in real time, through a deployed web interface. No GPU required, no API call to an LLM, sub-second inference.
+The app takes an Amazon-style product review — or a whole CSV of them — and returns a sentiment prediction (Positive / Negative) with a confidence score, in real time, through a deployed web interface. No GPU required, no API call to an LLM, sub-second inference.
 
 ```
-User Review
+User Review (single text OR batch CSV)
     ↓
 Text Preprocessing (lowercase, strip HTML, remove noise)
     ↓
@@ -31,8 +31,10 @@ TF-IDF Vectorization (uni-grams + bi-grams, max 1000 features)
     ↓
 Logistic Regression
     ↓
-Sentiment + Confidence Score
+Sentiment + Confidence Score + Keyword Signal Breakdown
 ```
+
+It started as a model comparison exercise. It's now closer to a small but genuinely usable review-triage tool — the kind you could actually hand to someone monitoring product feedback and have them get value from on day one.
 
 ---
 
@@ -62,6 +64,36 @@ A model is only as trustworthy as your honesty about its limits. Three failure m
 
 **Domain shift.** The model was trained on Amazon product reviews specifically. Vocabulary, review length, and tone on Amazon don't transfer cleanly to Twitter sentiment, app store reviews, or live customer support chat — all of which have different baseline sentiment vocabularies and informal slang the model has never seen.
 
+The keyword highlighting feature doesn't fix any of these three problems, but it does something almost as useful: it makes them visible. When the model gets a sarcastic or mixed review wrong, the keyword breakdown usually shows you exactly why — you can see it latched onto "excellent" and missed the sarcasm, or weighted the positive clause more heavily than the negative one. That transparency turns a silent failure into a legible one, which is most of what you actually want from an interpretable model.
+
+---
+
+## Making the Model Legible
+
+A classifier that just prints `"Positive (87.23% confidence)"` asks you to trust it blindly. That's a bad place to leave a model that — as the next section explains — has real, predictable failure modes. So the interface was built to expose its reasoning, not just its output:
+
+**Confidence bar.** The raw probability score is rendered as an animated bar that fills green or red depending on the call — faster to read at a glance than a percentage, especially when you're scanning many reviews back to back.
+
+**Keyword signal analysis.** The app highlights the specific words it picked up on — `excellent`, `terrible`, and so on — directly in the review text. This is the single most important interface decision in the app: it turns "the model says positive" into "the model says positive *because of these words*," which is the difference between a black box and a tool you can actually audit and trust.
+
+**Top keyword chips.** A cleaned, stopword-filtered list of the most prominent words in the review, displayed as chips. Useful for skimming a long review without reading the whole thing.
+
+**Text statistics panel.** Word count, sentence count, unique word count, average word length. Small, but it signals the tool is actually parsing the text rather than just running it through a black box and printing a label.
+
+**Example buttons.** Three pre-filled examples — clearly positive, mixed, and clearly negative — so a new visitor can see the model in action immediately, including on the mixed case where it's expected to be less confident. That last part matters: showing the model struggle a little on a genuinely ambiguous review is more honest than only ever demoing the easy cases.
+
+**Sidebar settings.** Toggles to show or hide each analysis section (confidence bar, keywords, stats), so the default view stays clean but power users can expand everything.
+
+---
+
+## Batch Analysis
+
+The biggest functional upgrade: you can now upload a CSV with a `review` column and get every row classified in one pass, with summary metrics — total reviews, positive count, negative count, positive rate — and a downloadable results CSV.
+
+This is what moves the project from "demo of a model" to "tool someone could actually use." A single-review classifier is a nice proof of concept; a batch processor that takes a day's worth of reviews and returns a triaged CSV is something a small team could genuinely plug into a feedback workflow without writing a line of code.
+
+**Analysis history.** Every review run through the single-review mode gets logged in session state and shown in a scrollable sidebar history with colour-coded sentiment badges — useful for comparing how the model handled a series of reviews in the same session, and it makes the app feel persistent rather than stateless.
+
 ---
 
 ## Why This Tradeoff Was Worth Making
@@ -80,18 +112,19 @@ Performance was assessed on Accuracy, Precision, Recall, F1-score, and Confusion
 
 ## What's Next
 
-If this moved toward production deployment, in priority order:
+The app is now usable for real review triage. What would still move it further toward production:
 
 - **Negation-aware preprocessing** — explicitly tagging negation scope so "not good" carries distinguishable signal from "good," rather than relying on bi-grams to catch it implicitly
 - **Threshold tuning** — moving off the default 0.5 cutoff to a threshold calibrated for the actual business cost of false negatives vs. false positives (missing a real complaint is usually worse than a false alarm)
 - **Transformer upgrade path** — DistilBERT as a drop-in replacement for the cases that matter most: sarcasm and mixed-sentiment reviews specifically, potentially as a second-stage model that only runs on reviews the classical model flags as low-confidence
 - **Class weighting over oversampling** — testing whether class-weighted loss reduces the overfitting risk that oversampling introduced, without sacrificing the recall gains
+- **Persistent batch history** — current analysis history lives in session state and resets on refresh; moving it to a lightweight database would let teams track sentiment trends across sessions, not just within one
 
 ---
 
 ## Real-World Applications
 
-E-commerce review monitoring, customer feedback triage, brand reputation tracking, social media sentiment monitoring, product quality early-warning systems, and support ticket prioritization.
+E-commerce review monitoring, customer feedback triage, brand reputation tracking, social media sentiment monitoring, product quality early-warning systems, and support ticket prioritization. With batch CSV analysis, a small ops or product team could realistically drop in a day's export of reviews and get a triaged, downloadable breakdown without writing any code.
 
 ---
 
